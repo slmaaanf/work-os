@@ -66,10 +66,10 @@ Unduh kode sumber dari GitHub ke komputer lokal Anda.
 git clone [https://github.com/slmaaanf/work-os.git](https://github.com/slmaaanf/work-os.git)
 cd work-os
 
-## Setup Konfigurasi (.env)
+Setup Konfigurasi (.env)
 cp .env.example .env
 
-## Install Dependensi PHP (Composer via Docker)
+Install Dependensi PHP (Composer via Docker)
 docker run --rm \
     -u "$(id -u):$(id -g)" \
     -v "$(pwd):/var/www/html" \
@@ -77,14 +77,14 @@ docker run --rm \
     laravelsail/php83-composer:latest \
     composer install --ignore-platform-reqs
 
-## Nyalakan Mesin Docker (Sail)
+Nyalakan Mesin Docker (Sail)
 ./vendor/bin/sail up -d
 
-## Setup Aplikasi Laravel
+Setup Aplikasi Laravel
 ./vendor/bin/sail artisan key:generate
 ./vendor/bin/sail artisan migrate
 
-## Build Frontend Assets (Vite)
+Build Frontend Assets (Vite)
 ./vendor/bin/sail npm install
 
 # Gunakan perintah ini untuk mengompilasi file satu kali (untuk production/testing)
