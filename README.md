@@ -1,59 +1,98 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🎯 Personal Work OS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sebuah *Productivity Dashboard* dan *Timeboxing Engine* yang dirancang khusus untuk menjembatani kesenjangan antara eksekusi teknis (Developer) dan pemikiran strategis (Project Management). 
 
-## About Laravel
+Aplikasi ini bukan sekadar *To-Do List*, melainkan sistem operasi kerja yang melacak **Akurasi Perencanaan**, **Distribusi Waktu**, dan **Jurnal Refleksi** dalam satu antarmuka terpusat.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 📖 Latar Belakang
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Sistem *To-Do List* konvensional memiliki kelemahan mendasar: mereka hanya melacak apakah sebuah tugas **Selesai** atau **Belum**. Mereka tidak melacak *Berapa lama waktu yang dihabiskan?*, *Seberapa akurat estimasi awalnya?*, dan *Mengapa waktu pengerjaannya membengkak?*.
 
-## Learning Laravel
+Bagi seorang profesional yang berorientasi pada manajerial dan *continuous improvement*, data historis sangatlah penting. Aplikasi **Personal Work OS** ini diciptakan untuk menyelesaikan masalah tersebut dengan memperkenalkan konsep:
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+1. **Pemisahan Estimasi & Alokasi:** Membedakan antara *Total Estimated Time* (misal: 4 jam untuk satu fitur) dengan *Daily Timebox Allocation* (misal: fokus 15 menit hari ini).
+2. **Drill-down Analytics:** Mengubah metrik pasif menjadi investigasi aktif untuk melihat *variance* (selisih) antara waktu yang direncanakan vs. aktual pada setiap proyek.
+3. **Penyatuan Konteks:** Menggabungkan pelacakan tugas, pelaporan *bug* (Root Cause & Solution), dan jurnal harian (*Daily Win, Oops Moment*) agar tidak tercecer di berbagai aplikasi yang berbeda.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 🛠️ Tools & Tech Stack
 
-## Agentic Development
+Aplikasi ini dibangun menggunakan arsitektur modern yang ringan namun tangguh:
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+*   **Framework Backend:** Laravel 11 (PHP 8.3)
+*   **Database:** MySQL / MariaDB
+*   **Frontend UI/UX:** Vanilla JavaScript (ES6+), CSS3, Blade Templating
+*   **Visualisasi Data:** Chart.js & DOM Manipulation
+*   **Interaksi UI:** SweetAlert2 (untuk *Pop-up Timebox* & Konfirmasi)
+*   **Build Tools:** Vite & Node.js
+*   **Environment & Deployment:** Docker Desktop, Laravel Sail, Windows Subsystem for Linux (WSL)
 
+---
+
+## ⚙️ Cara Kerja & Fitur Utama
+
+Bagaimana alur kerja (*workflow*) menggunakan aplikasi ini?
+
+1. **Hierarki Proyek (Project -> Milestone -> Task):** 
+   Setiap tugas tidak berdiri sendiri. Pengguna mendefinisikan tugas di bawah payung proyek dan *milestone* agar rapi di panel *Time Analysis*.
+2. **Input Estimasi & Timebox:** 
+   Pengguna memasukkan tugas, menentukan *Total Estimasi*, dan memberikan **Alokasi Hari Ini** (misal: 15 menit).
+3. **Current Focus Player (Timer):** 
+   Tugas yang masuk ke *Today's Plan* dapat dieksekusi dengan menekan tombol `▶ Start`. Sistem akan menghitung waktu secara *real-time*. Saat alokasi waktu habis, akan muncul *Pop-up* interaktif untuk menentukan tindakan selanjutnya (Selesai, Lanjut, atau Simpan Sesi).
+4. **Analitik Harian & Bulanan:** 
+   Waktu aktual dari setiap sesi akan diakumulasikan. Sistem akan menghitung **Akurasi Bulanan** (jika minimal 3 tugas berestimasi telah selesai) dan menampilkan distribusi waktu kerja (*Development, Bug Fix, Meeting, dll*).
+5. **Dual Theme Context Switching:** 
+   Aplikasi dilengkapi *toggle* **Work/Personal Mode**. Saat digeser ke *Personal Mode*, UI akan bertransformasi dari warna *Slate/Blue* (profesional) menjadi *Sakura Pink Pastel* secara instan, mengubah metrik menjadi aktivitas bersantai/*me-time*.
+
+---
+
+## 🚀 Panduan Menjalankan Aplikasi di Lokal
+
+Aplikasi ini berjalan di atas ekosistem **Docker** menggunakan **Laravel Sail**, sehingga Anda tidak perlu menginstal PHP atau MySQL secara manual di sistem operasi komputer Anda.
+
+### Prasyarat:
+Pastikan aplikasi berikut sudah terinstal dan berjalan:
+*   [Docker Desktop](https://www.docker.com/products/docker-desktop) (Pastikan integrasi WSL2 aktif jika menggunakan Windows)
+*   Git Bash / Terminal WSL
+
+### Langkah-langkah Instalasi:
+
+**1. Clone Repositori**
+Unduh kode sumber dari GitHub ke komputer lokal Anda.
 ```bash
-composer require laravel/boost --dev
+git clone [https://github.com/slmaaanf/work-os.git](https://github.com/slmaaanf/work-os.git)
+cd work-os
 
-php artisan boost:install
-```
+## Setup Konfigurasi (.env)
+cp .env.example .env
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Install Dependensi PHP (Composer via Docker)
+docker run --rm \
+    -u "$(id -u):$(id -g)" \
+    -v "$(pwd):/var/www/html" \
+    -w /var/www/html \
+    laravelsail/php83-composer:latest \
+    composer install --ignore-platform-reqs
 
-## Contributing
+## Nyalakan Mesin Docker (Sail)
+./vendor/bin/sail up -d
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## Setup Aplikasi Laravel
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate
 
-## Code of Conduct
+## Build Frontend Assets (Vite)
+./vendor/bin/sail npm install
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Gunakan perintah ini untuk mengompilasi file satu kali (untuk production/testing)
+./vendor/bin/sail npm run build
 
-## Security Vulnerabilities
+# ATAU, gunakan perintah ini jika Anda ingin mengedit kode dan melihat perubahannya secara live di browser:
+./vendor/bin/sail npm run dev
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# work-os
+Akses Aplikasi! 🎉
+Buka browser favorit Anda dan navigasikan ke:
+👉 http://localhost
