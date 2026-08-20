@@ -22,11 +22,7 @@ return new class extends Migration
 
             $table->string('title');
 
-            $table->enum('category', [
-                'work',
-                'life',
-                'learn',
-            ]);
+          $table->string('category');
 
             $table->enum('status', [
                 'planned',

@@ -14,14 +14,18 @@ class DailyPlan extends Model
     protected $fillable = [
         'user_id',
         'date',
-        'daily_win',
-        'oops_moment',
-        'lesson_learned',
+        'clock_in_at',  // Tambahan baru
+        'clock_out_at', // Tambahan baru
     ];
 
-    protected $casts = [
-        'date' => 'date',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'date' => 'date',
+            'clock_in_at' => 'datetime',  // Cast otomatis ke instance Carbon
+            'clock_out_at' => 'datetime', // Cast otomatis ke instance Carbon
+        ];
+    }
 
     public function user(): BelongsTo
     {

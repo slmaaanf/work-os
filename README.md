@@ -96,3 +96,6 @@ Build Frontend Assets (Vite)
 Akses Aplikasi! 🎉
 Buka browser favorit Anda dan navigasikan ke:
 👉 http://localhost
+
+Bersihakan databse 
+./vendor/bin/sail artisan migrate:fresh

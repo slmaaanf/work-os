@@ -21,11 +21,7 @@ return new class extends Migration
 
             $table->unsignedInteger('planned_mins');
 
-            $table->enum('status', [
-                'planned',
-                'in_progress',
-                'done_today',
-            ])->default('planned');
+            $table->string('status')->default('planned');
 
             $table->boolean('is_carried_over')->default(false);
 
