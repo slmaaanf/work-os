@@ -99,3 +99,6 @@ Buka browser favorit Anda dan navigasikan ke:
 
 Bersihakan databse 
 ./vendor/bin/sail artisan migrate:fresh
+
+Deploy 
+https://work-os-chi-six.vercel.app/
