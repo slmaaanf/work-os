@@ -17,34 +17,34 @@
 <div class="max-w-[1400px] mx-auto">
     <!-- HEADER -->
     <div>
-            <div class="flex items-center gap-3">
-                <!-- Judul berubah dinamis -->
-                <h1 class="text-3xl font-bold text-gray-800 tracking-tight">
-                    {{ (isset($isToday) && $isToday) ? "Today's Plan" : "Daily Plan" }}
-                </h1>
-                
-                <!-- INPUT DATE PICKER AJAIB -->
-                <input type="date" 
-                       id="date-navigator"
-                       value="{{ isset($activeDate) ? $activeDate->format('Y-m-d') : \Carbon\Carbon::today()->format('Y-m-d') }}" 
-                       onchange="window.location.href='/?date='+this.value"
-                       class="bg-gray-100 border-none text-gray-600 text-sm font-semibold rounded-lg p-2 cursor-pointer outline-none focus:ring-2 focus:ring-sky-300 hover:bg-gray-200 transition"
-                       title="Pilih tanggal untuk melihat atau merekap masa lalu">
-            </div>
-            <p class="text-gray-500 mt-1">
-                {{ isset($activeDate) ? $activeDate->format('l, d F Y') : \Carbon\Carbon::today()->format('l, d F Y') }}
-                @if(isset($isToday) && !$isToday) 
-                    <span class="ml-2 text-[10px] font-bold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase tracking-wider">Time Travel Mode</span> 
-                @endif
-            </p>
+        <div class="flex items-center gap-3">
+            <!-- Judul berubah dinamis -->
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">
+                {{ (isset($isToday) && $isToday) ? "Today's Plan" : "Daily Plan" }}
+            </h1>
+            
+            <!-- INPUT DATE PICKER AJAIB -->
+            <input type="date" 
+                   id="date-navigator"
+                   value="{{ isset($activeDate) ? $activeDate->format('Y-m-d') : \Carbon\Carbon::today()->format('Y-m-d') }}" 
+                   onchange="window.location.href='/?date='+this.value"
+                   class="bg-gray-100 border-none text-gray-600 text-sm font-semibold rounded-lg p-2 cursor-pointer outline-none focus:ring-2 focus:ring-sky-300 hover:bg-gray-200 transition"
+                   title="Pilih tanggal untuk melihat atau merekap masa lalu">
         </div>
+        <p class="text-gray-500 mt-1 mb-4">
+            {{ isset($activeDate) ? $activeDate->format('l, d F Y') : \Carbon\Carbon::today()->format('l, d F Y') }}
+            @if(isset($isToday) && !$isToday) 
+                <span class="ml-2 text-[10px] font-bold bg-amber-100 text-amber-600 px-2 py-0.5 rounded-full uppercase tracking-wider">Time Travel Mode</span> 
+            @endif
+        </p>
+        
         <div class="flex gap-2">
             <a href="/goals" class="bg-white border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium py-2 px-4 rounded-xl text-sm transition flex items-center gap-2 shadow-sm">
-    🎯 Goals & Habits
-</a>
+                🎯 Goals & Habits
+            </a>
             <a href="/recap" class="bg-white border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium py-2 px-4 rounded-xl text-sm transition flex items-center gap-2 shadow-sm">
-    📊 Weekly & Monthly Recap
-</a>
+                📊 Weekly & Monthly Recap
+            </a>
         </div>
     </div>
 
@@ -78,7 +78,7 @@
                 <form action="#" method="POST" class="flex flex-col gap-3">
                     <input type="text" id="task-input" placeholder="Add a new task..." class="w-full bg-sky-50/50 border border-sky-100 text-sm rounded-xl focus:ring-sky-300 focus:border-sky-300 p-3 outline-none color-transition">
                     
-                    <div id="advanced-fields" class="flex gap-2">
+                    <div id="advanced-fields" class="flex gap-2 relative">
                         <!-- DROPDOWN 1: PROJECT ASLI DARI DATABASE -->
                         <select id="project-select" class="flex-1 bg-gray-50/50 border border-gray-200 text-sm rounded-xl p-3 outline-none text-gray-600">
                             <option value="">📁 Select Project (Optional)</option>
@@ -87,21 +87,46 @@
                             @endforeach
                         </select>
 
-                        <!-- DROPDOWN 2: GOALS ASLI DARI DATABASE -->
-                        <select id="goal-milestone-select" class="flex-1 bg-gray-50/50 border border-gray-200 text-sm rounded-xl p-3 outline-none text-gray-600">
-                            <option value="">🎯 Select Goal (Optional)</option>
-                            @foreach($userGoals as $goal)
-                                <optgroup label="🎯 {{ $goal->title }}">
-                                    <option value="{{ $goal->id }}_null">➡️ Just Goal: {{ $goal->title }}</option>
-                                    @foreach($goal->milestones as $ms)
-                                        <option value="{{ $goal->id }}_{{ $ms->id }}">↳ Step: {{ $ms->title }}</option>
-                                    @endforeach
-                                </optgroup>
-                            @endforeach
-                        </select>
+                        <!-- DROPDOWN 2: GOALS CUSTOM ALA NOTION -->
+                        <div class="relative flex-1" id="custom-goal-dropdown">
+                            <!-- Input rahasia penampung ID untuk fungsi submitTask() -->
+                            <input type="hidden" id="goal-milestone-select" value="">
+                            
+                            <!-- Tombol Dropdown Utama -->
+                            <button type="button" onclick="toggleDropdown()" class="w-full flex justify-between items-center bg-gray-50/50 border border-gray-200 text-sm rounded-xl p-3 outline-none text-gray-600 hover:border-sky-400 transition-colors">
+                                <span id="dropdown-text" class="flex items-center gap-2 truncate">🎯 Select Goal (Optional)</span>
+                                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </button>
+
+                            <!-- Isi Menu Dropdown -->
+                            <div id="dropdown-menu" class="hidden absolute z-50 w-full mt-2 bg-white border border-gray-100 shadow-xl rounded-xl max-h-72 overflow-y-auto py-2 text-left">
+                                <div onclick="selectGoalItem('', '🎯 Select Goal (Optional)', 'text-gray-400')" class="px-4 py-2 hover:bg-gray-50 cursor-pointer text-sm text-gray-500 transition border-b border-gray-50">
+                                    <span class="italic">-- No Goal (General Task) --</span>
+                                </div>
+
+                                @foreach($userGoals as $goal)
+                                    <div class="pt-2 pb-1">
+                                        <div class="px-4 py-1.5 text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-50/50 flex items-center gap-1.5">
+                                            <span class="w-2 h-2 rounded-full bg-{{ $goal->color ?? 'sky' }}-400"></span>
+                                            {{ $goal->title }}
+                                        </div>
+                                        
+                                        <div onclick="selectGoalItem('{{ $goal->id }}_null', '🎯 {{ addslashes($goal->title) }}', 'text-gray-800')" class="px-4 py-2 pl-8 hover:bg-sky-50 cursor-pointer text-sm text-gray-700 font-medium transition flex items-center gap-2">
+                                            ➡️ Just Goal: {{ $goal->title }}
+                                        </div>
+
+                                        @foreach($goal->milestones as $ms)
+                                            <div onclick="selectGoalItem('{{ $goal->id }}_{{ $ms->id }}', '📌 {{ addslashes($ms->title) }}', 'text-gray-600')" class="px-4 py-2 pl-8 hover:bg-gray-50 cursor-pointer text-sm text-gray-600 transition flex items-center gap-2 border-l-2 border-transparent hover:border-sky-400">
+                                                ↳ Step: {{ $ms->title }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="flex gap-2">
+                    <div class="flex gap-2 mt-1">
                         <input type="number" id="mins-input" placeholder="Mins (e.g. 30)" class="w-1/3 bg-gray-50/50 border border-gray-200 text-sm rounded-xl p-3 outline-none">
                         <button type="button" id="btn-add" onclick="submitTask()" class="flex-1 bg-sky-400 hover:bg-sky-500 text-white font-semibold py-3 px-6 rounded-xl shadow-sm color-transition">Add Task</button>
                     </div>
@@ -261,6 +286,28 @@
 <script>
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     let currentMode = 'cimory'; 
+
+    // --- FUNGSI CUSTOM DROPDOWN GOAL ---
+    function toggleDropdown() {
+        document.getElementById('dropdown-menu').classList.toggle('hidden');
+    }
+
+    function selectGoalItem(value, text, textColorClass) {
+        document.getElementById('goal-milestone-select').value = value;
+        const textSpan = document.getElementById('dropdown-text');
+        textSpan.className = `flex items-center gap-2 truncate font-medium ${textColorClass}`;
+        textSpan.innerHTML = text;
+        document.getElementById('dropdown-menu').classList.add('hidden');
+    }
+
+    // Menutup dropdown jika user klik di luarnya
+    document.addEventListener('click', function(event) {
+        const container = document.getElementById('custom-goal-dropdown');
+        if (container && !container.contains(event.target)) {
+            document.getElementById('dropdown-menu').classList.add('hidden');
+        }
+    });
+    // ------------------------------------
 
     function switchMode(mode) {
         currentMode = mode; 
@@ -493,6 +540,8 @@
         const titleInput = document.getElementById('task-input');
         const minsInput = document.getElementById('mins-input');
         const projectSelect = document.getElementById('project-select');
+        
+        // PENTING: goalSelect sekarang mengambil nilai dari input tersembunyi
         const goalSelect = document.getElementById('goal-milestone-select');
         const btnAdd = document.getElementById('btn-add');
 
@@ -509,7 +558,6 @@
             milestoneId = parts[1] !== 'null' ? parts[1] : null;
         }
 
-        // PENYEBAB ERROR SEBELUMNYA: Variabel ini hilang/belum dideklarasikan
         let projectId = (projectSelect.style.display !== 'none' && projectSelect.value) ? projectSelect.value : null;
 
         const activeDateValue = document.getElementById('date-navigator').value;
@@ -524,7 +572,7 @@
                     title: titleInput.value, 
                     category: currentMode, 
                     planned_mins: minsInput.value || 0,
-                    project_id: projectId, // Sekarang projectId sudah valid!
+                    project_id: projectId,
                     goal_id: goalId,
                     milestone_id: milestoneId,
                     clock_in: currentMode === 'cimory' ? timeIn : null,

@@ -38,7 +38,7 @@
             <button onclick="document.getElementById('modal-add-goal').showModal()" class="text-sm font-semibold text-sky-500 hover:text-sky-600 bg-sky-50 px-3 py-1.5 rounded-lg border border-sky-100 transition">+ Add Goal</button>
         </div>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
             @forelse($goals as $goal)
                 @php 
                     $color = $goal->color ?? 'sky'; 
@@ -61,14 +61,16 @@
                                 </button>
                             </div>
                         </div>
+                       @if($goal->description)
                         <p class="text-[11px] text-gray-400">{{ $goal->description }}</p>
+                        @endif
                     </div>
 
                     <div class="w-full bg-gray-100 rounded-full h-2 mb-4">
                         <div class="{{ $barClass }} h-2 rounded-full transition-all duration-1000" style="width: {{ $goal->progress }}%"></div>
                     </div>
 
-                    <div class="mt-auto space-y-2 pt-2 border-t border-gray-50">
+                    <div class="space-y-2 pt-4 border-t border-gray-50">
                         @forelse($goal->milestones as $ms)
                             <div onclick="toggleMilestone({{ $ms->id }})" class="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 p-1 -ml-1 rounded transition">
                                 @if($ms->is_completed)
