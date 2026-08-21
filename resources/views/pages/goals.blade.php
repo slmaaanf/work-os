@@ -70,7 +70,7 @@
 
                     <div class="mt-auto space-y-2 pt-2 border-t border-gray-50">
                         @forelse($goal->milestones as $ms)
-                            <div class="flex items-center gap-2 text-xs">
+                            <div onclick="toggleMilestone({{ $ms->id }})" class="flex items-center gap-2 text-xs cursor-pointer hover:bg-gray-50 p-1 -ml-1 rounded transition">
                                 @if($ms->is_completed)
                                     <span class="text-emerald-500 shrink-0">✅</span>
                                     <span class="text-gray-400 line-through truncate">{{ $ms->title }}</span>
@@ -321,6 +321,27 @@
             alert('Terjadi kesalahan pada sistem.');
         }
     }
+    // FUNGSI CENTANG MILESTONE
+async function toggleMilestone(id) {
+    try {
+        let res = await fetch(`/milestones/${id}/toggle`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            }
+        });
+
+        if (res.ok) {
+            // Refresh halaman agar persentase & garis loading bar langsung terupdate
+            window.location.reload(); 
+        } else {
+            alert('Gagal mengupdate progress.');
+        }
+    } catch (error) {
+        alert('Terjadi kesalahan pada sistem.');
+    }
+}
 </script>
 
 </body>

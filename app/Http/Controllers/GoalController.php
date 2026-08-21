@@ -133,4 +133,24 @@ class GoalController extends Controller
 
     return response()->json(['message' => 'Goal berhasil dihapus!']);
 }
+public function toggleMilestone($id)
+{
+    // Cari milestone yang diklik
+    $milestone = \App\Models\Milestone::findOrFail($id);
+    
+    // Ubah statusnya (jika false jadi true, jika true jadi false)
+    $milestone->is_completed = !$milestone->is_completed;
+    $milestone->save();
+
+    // Hitung ulang persentase progress dari Goal induknya
+    $goal = $milestone->goal;
+    $total = $goal->milestones()->count();
+    $completed = $goal->milestones()->where('is_completed', true)->count();
+    
+    // Update persentase (Progress = Total selesai / Total semua * 100)
+    $goal->progress = $total > 0 ? round(($completed / $total) * 100) : 0;
+    $goal->save();
+
+    return response()->json(['message' => 'Progress updated!', 'progress' => $goal->progress]);
+}
 }
