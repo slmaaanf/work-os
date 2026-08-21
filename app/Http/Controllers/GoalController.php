@@ -125,4 +125,12 @@ class GoalController extends Controller
 
         return response()->json(['success' => true, 'logs' => $logs]);
     }
+    public function destroy($id)
+{
+    // Mencari goal berdasarkan ID lalu menghapusnya
+    $goal = \App\Models\Goal::findOrFail($id);
+    $goal->delete();
+
+    return response()->json(['message' => 'Goal berhasil dihapus!']);
+}
 }

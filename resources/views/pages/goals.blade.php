@@ -50,7 +50,16 @@
                     <div class="mb-4">
                         <div class="flex justify-between items-start mb-2">
                             <h3 class="font-bold text-gray-800 leading-tight">{{ $goal->title }}</h3>
-                            <span class="text-xs font-bold px-2 py-1 rounded {{ $bgClass }} {{ $textClass }}">{{ $goal->progress }}%</span>
+                            
+                            <!-- BAGIAN PERSENTASE & TOMBOL HAPUS -->
+                            <div class="flex items-center gap-3">
+                                <span class="text-xs font-bold px-2 py-1 rounded {{ $bgClass }} {{ $textClass }}">{{ $goal->progress }}%</span>
+                                <button onclick="deleteGoal({{ $goal->id }})" class="text-red-400 hover:text-red-600 transition-colors" title="Hapus Goal">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                         <p class="text-[11px] text-gray-400">{{ $goal->description }}</p>
                     </div>
@@ -139,16 +148,12 @@
 
 <!-- MODAL ADD GOAL -->
 <dialog id="modal-add-goal" class="bg-transparent p-0 w-[95%] max-w-lg m-auto">
-    <!-- Wrapper utama yang mengatur Flexbox & Batas Tinggi (max-height) -->
     <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 flex flex-col max-h-[90vh] overflow-hidden">
-        
-        <!-- HEADER (Tetap menempel di atas) -->
         <div class="p-5 bg-slate-50 border-b border-gray-100 flex justify-between items-center shrink-0">
             <h3 class="text-lg font-bold text-gray-800">Add New Goal</h3>
             <button onclick="document.getElementById('modal-add-goal').close()" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 text-gray-600 hover:bg-red-100 hover:text-red-500 transition font-bold">&times;</button>
         </div>
         
-        <!-- BODY (Area yang bisa di-scroll jika isinya banyak) -->
         <div class="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
             <div>
                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Goal Title</label>
@@ -179,7 +184,6 @@
             </div>
         </div>
 
-        <!-- FOOTER (Tombol Save Goal tetap menempel di bawah) -->
         <div class="p-5 bg-white border-t border-gray-100 shrink-0">
             <button type="button" onclick="saveGoal()" class="w-full bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 rounded-xl transition shadow-md">
                 Save Goal
@@ -218,49 +222,46 @@
         input.placeholder = 'Next Step...';
         container.appendChild(input);
         
-        // Auto scroll ke bawah tiap kali nambah input baru
         const bodyDiv = document.querySelector('#modal-add-goal .overflow-y-auto');
         setTimeout(() => { bodyDiv.scrollTop = bodyDiv.scrollHeight; }, 50);
     }
 
     async function saveGoal() {
-    const title = document.getElementById('goal-title').value;
-    const desc = document.getElementById('goal-desc').value;
-    const color = document.querySelector('input[name="goal-color"]:checked').value;
-    const milestones = Array.from(document.querySelectorAll('.milestone-input')).map(i => i.value.trim()).filter(v => v !== '');
+        const title = document.getElementById('goal-title').value;
+        const desc = document.getElementById('goal-desc').value;
+        const color = document.querySelector('input[name="goal-color"]:checked').value;
+        const milestones = Array.from(document.querySelectorAll('.milestone-input')).map(i => i.value.trim()).filter(v => v !== '');
 
-    if (!title) { alert('Title wajib diisi!'); return; }
+        if (!title) { alert('Title wajib diisi!'); return; }
 
-    // 1. Kunci tombol agar tidak bisa di-spam klik
-    const btn = document.querySelector('button[onclick="saveGoal()"]');
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Saving... ⏳';
-    btn.disabled = true;
-    btn.classList.add('opacity-50', 'cursor-not-allowed');
+        const btn = document.querySelector('button[onclick="saveGoal()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = 'Saving... ⏳';
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
 
-    try {
-        let res = await fetch('/goals', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
-            body: JSON.stringify({ title, description: desc, color, milestones })
-        });
-        
-        if (res.ok) {
-            window.location.reload();
-        } else {
-            alert('Terjadi kesalahan saat menyimpan.');
-        }
-    } catch (error) {
-        alert('Gagal menyambung ke server.');
-    } finally {
-        // 2. Kembalikan kondisi tombol jika prosesnya gagal (agar bisa diklik lagi)
-        if (!res?.ok) {
-            btn.innerHTML = originalText;
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        try {
+            let res = await fetch('/goals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                body: JSON.stringify({ title, description: desc, color, milestones })
+            });
+            
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                alert('Terjadi kesalahan saat menyimpan.');
+            }
+        } catch (error) {
+            alert('Gagal menyambung ke server.');
+        } finally {
+            if (!res?.ok) {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
         }
     }
-}
 
     async function saveHabit() {
         const title = document.getElementById('habit-title').value;
@@ -295,6 +296,29 @@
             } else {
                 btnElement.innerHTML = ``;
             }
+        }
+    }
+
+    // FUNGSI HAPUS GOAL
+    async function deleteGoal(id) {
+        if (!confirm('Yakin ingin menghapus Milestone ini?')) return;
+
+        try {
+            let res = await fetch(`/goals/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (res.ok) {
+                window.location.reload();
+            } else {
+                alert('Gagal menghapus data.');
+            }
+        } catch (error) {
+            alert('Terjadi kesalahan pada sistem.');
         }
     }
 </script>
