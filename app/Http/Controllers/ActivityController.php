@@ -68,7 +68,6 @@ class ActivityController extends Controller
         return response()->json(['success' => true]);
     }
 
-    // Fungsi untuk Mark as Completed (Menyelesaikan tugas selamanya)
     public function complete(Request $request, $id)
     {
         $dpa = DailyPlanActivity::findOrFail($id);
@@ -79,6 +78,39 @@ class ActivityController extends Controller
             'achievements' => $request->achievements,
             'blockers' => $request->blockers,
         ]);
+
+        // ==========================================
+        // LOGIKA OTOMATIS UPDATE PERSENTASE GOAL
+        // ==========================================
+        $activity = $dpa->activity; // Ambil relasi ke tabel activities
+        
+        if ($activity && $activity->goal_id) {
+            $goal = \App\Models\Goal::find($activity->goal_id);
+            
+            if ($goal) {
+                // 1. Hitung total Milestone (langkah manual)
+                $totalMilestones = $goal->milestones()->count();
+                $completedMilestones = $goal->milestones()->where('is_completed', true)->count();
+                
+                // 2. Hitung total Task harian yang terhubung ke Goal ini
+                $totalTasks = \App\Models\Activity::where('goal_id', $goal->id)->count();
+                
+                // 3. Hitung Task harian yang statusnya sudah 'completed'
+                $completedTasks = \App\Models\Activity::where('goal_id', $goal->id)
+                    ->whereHas('dailyPlanActivities', function($q) {
+                        $q->where('status', 'completed');
+                    })->count();
+                    
+                // 4. Kalkulasi total keseluruhan
+                $totalItems = $totalMilestones + $totalTasks;
+                $completedItems = $completedMilestones + $completedTasks;
+                
+                // 5. Update nilai progress (persentase)
+                $goal->progress = $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
+                $goal->save();
+            }
+        }
+        // ==========================================
 
         return response()->json(['success' => true]);
     }
