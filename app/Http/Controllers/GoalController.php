@@ -73,26 +73,41 @@ class GoalController extends Controller
 
     // Simpan Goal Baru
     public function storeGoal(Request $request)
-    {
-        $request->validate(['title' => 'required|string|max:255', 'color' => 'required|string']);
-        $user = User::where('email', 'salma@cimory.com')->first();
+{
+    // Tambahkan validasi agar judul goal tidak boleh kosong
+    $request->validate([
+        'title' => 'required|string|max:255', 
+        'color' => 'required|string'
+    ]);
+    
+    $user = User::where('email', 'salma@cimory.com')->first();
 
-        $goal = Goal::create([
-            'user_id' => $user->id,
-            'title' => $request->title,
-            'description' => $request->description,
-            'color' => $request->color,
-        ]);
+    // Cek apakah goal dengan judul yang persis sama sudah pernah dibuat sebelumnya oleh user ini
+    $existingGoal = Goal::where('user_id', $user->id)->where('title', $request->title)->first();
+    if ($existingGoal) {
+        return response()->json([
+            'message' => 'Goal dengan judul tersebut sudah ada! Silakan gunakan nama yang berbeda.'
+        ], 422); // Kode 422 (Unprocessable Entity) aman dari Server Error
+    }
 
-        if ($request->filled('milestones')) {
-            foreach ($request->milestones as $ms_title) {
-                if (!empty($ms_title)) {
-                    Milestone::create(['goal_id' => $goal->id, 'title' => $ms_title]);
-                }
+    // Jika aman, buat goal baru seperti biasa...
+    $goal = Goal::create([
+        'user_id' => $user->id,
+        'title' => $request->title,
+        'description' => $request->description,
+        'color' => $request->color,
+    ]);
+
+    if ($request->filled('milestones')) {
+        foreach ($request->milestones as $ms_title) {
+            if (!empty($ms_title)) {
+                \App\Models\Milestone::create(['goal_id' => $goal->id, 'title' => $ms_title]);
             }
         }
-        return response()->json(['success' => true]);
     }
+    
+    return response()->json(['success' => true]);
+}
 
     // Simpan Habit Baru (Bisa dari input Personal Task / Add Habit)
     public function storeHabit(Request $request)
