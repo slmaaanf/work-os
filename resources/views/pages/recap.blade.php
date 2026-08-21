@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weekly Recap - OS</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -115,7 +116,7 @@
                 @endforelse
             </div>
         </div>
-    </div> <!-- PENUTUP GRID 2 KOLOM YANG SEBELUMNYA HILANG -->
+    </div> <!-- PENUTUP GRID 2 KOLOM -->
 
     <!-- MONTHLY CALENDAR SECTION (BOTTOM) -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
@@ -226,12 +227,22 @@
                                     @endphp
                                     <div class="bg-white rounded-xl p-4 border {{ $isCompleted ? 'border-emerald-100 shadow-sm' : 'border-gray-200 border-dashed' }}">
                                         
+                                        <!-- BAGIAN HEADER KARTU (TERMASUK TOMBOL DELETE) -->
                                         <div class="flex justify-between items-start mb-2">
                                             <div class="flex items-center gap-2">
                                                 <span class="text-lg leading-none">{{ $isCompleted ? '✅' : '⏳' }}</span>
                                                 <h4 class="font-bold text-sm {{ $isCompleted ? 'text-gray-500 line-through' : 'text-gray-800' }}">{{ $activity->activity->title }}</h4>
                                             </div>
-                                            <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-600 uppercase">{{ $cat }}</span>
+                                            
+                                            <div class="flex items-center gap-3">
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-gray-100 text-gray-600 uppercase">{{ $cat }}</span>
+                                                <!-- TOMBOL HAPUS (BARU) -->
+                                                <button onclick="deleteActivity({{ $activity->id }})" class="text-red-300 hover:text-red-600 transition-colors shrink-0" title="Hapus Permanen">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                    </svg>
+                                                </button>
+                                            </div>
                                         </div>
                                         
                                         @if($isCompleted)
@@ -270,6 +281,29 @@
     function closeModal(dateString) {
         const modal = document.getElementById('modal-' + dateString);
         if(modal) { modal.close(); }
+    }
+
+    // FUNGSI HAPUS AKTIVITAS (BARU)
+    async function deleteActivity(id) {
+        if (!confirm('Yakin ingin menghapus task ini dari riwayat? Data akan hilang permanen.')) return;
+
+        try {
+            let response = await fetch(`/activities/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                window.location.reload(); 
+            } else {
+                alert('Gagal menghapus data.');
+            }
+        } catch (error) {
+            alert('Terjadi kesalahan pada sistem.');
+        }
     }
 
     document.addEventListener('DOMContentLoaded', function() {

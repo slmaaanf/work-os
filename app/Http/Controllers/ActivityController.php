@@ -96,4 +96,17 @@ class ActivityController extends Controller
 
         return response()->json(['success' => true]);
     }
+    public function destroy($id)
+{
+    // Cari data aktivitas berdasarkan ID.
+    // Ganti 'DailyPlanActivity' dengan model yang kamu gunakan untuk tabel ini, 
+    // misalnya 'Activity' atau 'Task' sesuai struktur database-mu.
+    $activity = \App\Models\DailyPlanActivity::find($id); 
+    
+    if($activity) {
+        $activity->delete();
+    }
+
+    return response()->json(['message' => 'Task berhasil dihapus dari riwayat!']);
+}
 }

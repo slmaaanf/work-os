@@ -68,3 +68,4 @@ Route::post('/habits', [GoalController::class, 'storeHabit']);
 Route::post('/habits/{id}/toggle', [GoalController::class, 'toggleHabit']);
 Route::delete('/goals/{id}', [GoalController::class, 'destroy']);
 Route::post('/milestones/{id}/toggle', [GoalController::class, 'toggleMilestone']);
+Route::delete('/activities/{id}', [App\Http\Controllers\ActivityController::class, 'destroy']);
