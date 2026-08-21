@@ -224,20 +224,43 @@
     }
 
     async function saveGoal() {
-        const title = document.getElementById('goal-title').value;
-        const desc = document.getElementById('goal-desc').value;
-        const color = document.querySelector('input[name="goal-color"]:checked').value;
-        const milestones = Array.from(document.querySelectorAll('.milestone-input')).map(i => i.value.trim()).filter(v => v !== '');
+    const title = document.getElementById('goal-title').value;
+    const desc = document.getElementById('goal-desc').value;
+    const color = document.querySelector('input[name="goal-color"]:checked').value;
+    const milestones = Array.from(document.querySelectorAll('.milestone-input')).map(i => i.value.trim()).filter(v => v !== '');
 
-        if (!title) { alert('Title wajib diisi!'); return; }
+    if (!title) { alert('Title wajib diisi!'); return; }
 
+    // 1. Kunci tombol agar tidak bisa di-spam klik
+    const btn = document.querySelector('button[onclick="saveGoal()"]');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Saving... ⏳';
+    btn.disabled = true;
+    btn.classList.add('opacity-50', 'cursor-not-allowed');
+
+    try {
         let res = await fetch('/goals', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
             body: JSON.stringify({ title, description: desc, color, milestones })
         });
-        if (res.ok) window.location.reload();
+        
+        if (res.ok) {
+            window.location.reload();
+        } else {
+            alert('Terjadi kesalahan saat menyimpan.');
+        }
+    } catch (error) {
+        alert('Gagal menyambung ke server.');
+    } finally {
+        // 2. Kembalikan kondisi tombol jika prosesnya gagal (agar bisa diklik lagi)
+        if (!res?.ok) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+            btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        }
     }
+}
 
     async function saveHabit() {
         const title = document.getElementById('habit-title').value;

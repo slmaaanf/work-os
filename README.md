@@ -102,3 +102,8 @@ Bersihakan databse
 
 Deploy 
 https://work-os-chi-six.vercel.app/
+
+Update 
+git add .
+git commit -m ""
+git push origin main
