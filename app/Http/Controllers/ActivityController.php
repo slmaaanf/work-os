@@ -68,6 +68,7 @@ class ActivityController extends Controller
         return response()->json(['success' => true]);
     }
 
+    // Fungsi untuk Mark as Completed (Menyelesaikan tugas selamanya)
     public function complete(Request $request, $id)
     {
         $dpa = DailyPlanActivity::findOrFail($id);
@@ -80,32 +81,31 @@ class ActivityController extends Controller
         ]);
 
         // ==========================================
-        // LOGIKA OTOMATIS UPDATE PERSENTASE GOAL
+        // KALKULATOR GOAL YANG AMAN DARI ERROR
         // ==========================================
-        $activity = $dpa->activity; // Ambil relasi ke tabel activities
+        $activity = $dpa->activity; // Mengambil data activity terkait
         
         if ($activity && $activity->goal_id) {
             $goal = \App\Models\Goal::find($activity->goal_id);
             
             if ($goal) {
-                // 1. Hitung total Milestone (langkah manual)
+                // 1. Hitung total milestone manual
                 $totalMilestones = $goal->milestones()->count();
                 $completedMilestones = $goal->milestones()->where('is_completed', true)->count();
                 
-                // 2. Hitung total Task harian yang terhubung ke Goal ini
+                // 2. Hitung total task harian yang punya goal_id ini
                 $totalTasks = \App\Models\Activity::where('goal_id', $goal->id)->count();
                 
-                // 3. Hitung Task harian yang statusnya sudah 'completed'
-                $completedTasks = \App\Models\Activity::where('goal_id', $goal->id)
-                    ->whereHas('dailyPlanActivities', function($q) {
-                        $q->where('status', 'completed');
-                    })->count();
+                // 3. Hitung task harian yang statusnya sudah 'completed' di tabel daily_plan_activities
+                $completedTasks = \App\Models\DailyPlanActivity::whereHas('activity', function($q) use ($goal) {
+                    $q->where('goal_id', $goal->id);
+                })->where('status', 'completed')->count();
                     
                 // 4. Kalkulasi total keseluruhan
                 $totalItems = $totalMilestones + $totalTasks;
                 $completedItems = $completedMilestones + $completedTasks;
                 
-                // 5. Update nilai progress (persentase)
+                // 5. Update persentase goal
                 $goal->progress = $totalItems > 0 ? round(($completedItems / $totalItems) * 100) : 0;
                 $goal->save();
             }
